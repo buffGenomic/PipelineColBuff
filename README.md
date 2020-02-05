@@ -43,5 +43,17 @@ for FILE in $(ls *R1.fastq | sed 's/_R1.fastq//'); do metaspades.py -1 ${FILE}_R
 To increase the size and number of contigs and generate the "bins" (individual putative genomes).
 ```
 for FILE in $(ls *Comb.fastq | sed 's/_Comb.fastq//'); do metaspades.py -1 ${FILE}Comb1.fastq -2 ${FILE}Comb2.fastq -o ${FILE}; done
-...
+```
 
+For protein prediction by de novo assembly
+```
+for FILE in $(ls *R1.fastq | sed 's/_R1.fastq//'); do plass assemble ${FILE}_R1.fastq -2 ${FILE}_R2.fastq assembly.fas tmp; done
+```
+For the identification of the genomic characteristics contained in our individual contigs.
+```
+for FILE in scaffolds.fasta; do prokka --cpus 24 --centre X --compliant --outdir ${FILE/_metaspades*/_prokka}1 --prefix ${FILE/_metaspades*/} $FILE; done
+```
+For the identification of the genomic characteristics contained in our combined contigs.
+```
+for FILE in scaffoldsCombined.fasta; do prokka --cpus 24 --centre X --compliant --outdir ${FILE/_metaspades*/_prokka}1 --prefix ${FILE/_metaspades*/} $FILE; done
+```
