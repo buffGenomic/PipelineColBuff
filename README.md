@@ -1,5 +1,5 @@
 #Pipeline ColBuff
-# Project Workflow for Differences in methane emissions in two cohorts of Colombian
+# Project Workflow for Differences in methane emissions in two cohorts of Colombian buffalos were not associated with significant changes in their rumen microbiome
 #
 
 ## Getting Started
