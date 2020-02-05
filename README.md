@@ -57,3 +57,24 @@ For the identification of the genomic characteristics contained in our combined 
 ```
 for FILE in scaffoldsCombined.fasta; do prokka --cpus 24 --centre X --compliant --outdir ${FILE/_metaspades*/_prokka}1 --prefix ${FILE/_metaspades*/} $FILE; done
 ```
+To eliminate redundancy and reunite families.
+```
+metabat2 -i scaffolds.fasta -a depth.txt -o bins_dir/bin
+```
+To obtain our set of non-redundant protein sequences
+```
+mmseqs easy-linclust prokka_PLASS_allSamples.faa clusterRes tmp
+```
+To obtain phylogenetic relationships according to each bin
+```
+for FILE in *.fastq; do snakemake --use-conda --cluster-config MAGpy.json --cluster "qsub -V -cwd -pe sharedmem {cluster.core} -l h_rt= {cluster.time} -l h_vmem={cluster.vmem} -P {cluster.proj}" --jobs 1000 $FILE; done
+```
+To get the best hits for subsequent scoring
+```
+diamond blastp -d rumiref100.dmnd -q clusterRes_rep_seq.fasta --threads 12 -o clusterRes_rep_seq-rumiref100.out
+```
+For the realization of statistical comparisons by linear discriminant analysis
+```
+format_input.py *.txt *.in -c 1 -s 2 -u 3 -o 1000000
+run_lefse.py *.in hmp_Ressmall.res
+```
