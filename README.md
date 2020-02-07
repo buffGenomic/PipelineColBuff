@@ -30,7 +30,7 @@ To inspect quality scores of bases, run the following command
 ```
 fastqc *.fastq
 # Fastq files can also be in a compressed format
-For multiple files
+# For multiple files
 for i in ./TrimmedOutputs/*.fastq
 do
 	fastqc -o ./outputs $i 
