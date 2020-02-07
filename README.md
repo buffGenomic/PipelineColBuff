@@ -2,9 +2,12 @@
 # Project Workflow for Differences in methane emissions in two cohorts of Colombian buffalos were not associated with significant changes in their rumen microbiome
 #
 ## Authors
-Juan Jovel, Office of Research. Faculty of Medicine and Dentistry. University of Alberta. Edmonton, AB,Canada T6G 2E1.
-Sandra Bibiana Aguilar-Marin, Faculty of Agricultural Sciences, University of Caldas, Caldas, Colombia.
-Gustavo A. Isaza, Faculty of Engineering, University of Caldas, Caldas, Colombia. 
+Juan Jovel, Office of Research. Faculty of Medicine and Dentistry. University of Alberta. Edmonton, AB,Canada T6G 2E1
+
+Sandra Bibiana Aguilar-Marin, Faculty of Agricultural Sciences, University of Caldas, Caldas, Colombia
+
+Gustavo A. Isaza, Faculty of Engineering, University of Caldas, Caldas, Colombia
+
  
 ## Getting Started
 
