@@ -9,33 +9,50 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisites
 
 Multipe Bioinformatics Tools, Conda, BioConda, Python 3.X, MPI, OpenMP, SLURM HTC/HPC, snakemake
+Multipe Bioinformatics Tools are required for implementing this pipeline. However, to prevent conflicting versions of required software in each case, we suggest to install packages using the conda package manager (https://docs.conda.io/projects/conda/en/latest/index.html ) in separate environments. Many bioinformatics software are available in the Bioconda repository (https://anaconda.org/bioconda/).
+Notes:
+1. All command lines assume that the required software has been installed as above.
+2. $PWD refers to the working directory where data is
 
 ```
-Example
-conda install bwa
+conda create -n <environment_name> -c  <channel>  <software_name>
+ 
+Or simply by:
+conda install <software_name>
+
+# This last command will not install the software in a separate environment and could run into conflicting issues with different software versions.
 ```
 
 ### Running Pipeline
 
-To obtain sequences with optimal bases quality, suitable for assembly and alignment.
+To inspect quality scores of bases, run the following command
 
 ```
+fastqc *.fastq
+# Fastq files can also be in a compressed format
+For multiple files
 for i in ./TrimmedOutputs/*.fastq
 do
 	fastqc -o ./outputs $i 
 done
 ```
 
-To match the reads in their 5´and 3´ sequences, for their optimal assembly and alignment performance.
+To trim the reads in their 5´and 3´ sequences, according to a user-defined quality threshold (Q>30 in this case), a minimal length of 120 bases and using a window size of three bases for quality trimming (it requires a FASTA file containing the sequence of adapters to be trimmed). The following example is for compressed files with file name in the following format sample_R[1-2].fastq.gz:
 
 ```
-for i in ./tempData/*.fastq
-do
-        f="$(basename -- $i)"
-	fastq-mcf adapters.fa -o ${f}_trim30.fastq $i -k 0 -l 120 -w 3 -q 30
-done
+for FILE in $PWD/*R1.fastq.gz; do fastq-mcf adapters.fa -o ${FILE/R1.fastq.gz/trim.fq.gz} -o  ${FILE/R1.fastq.gz/R2.trim.fq.gz} $FILE ${FILE/R1/R2} -k 0 -l 120 -w 3 -q 30
+```
+In to conduct combined assembly (all samples together), files have to be concatenated. All files corresponding to end1 (R1 files) will be combined and the same will be done for end2 files (R2).
+Concatenate all files corresponding to end1 and end2 (example with compressed files):
+```
+cat *R1.fastq.gz > allSamples_R1.fq.gz
+cat *R2.fastq.gz > allSamples_R2.fq.gz
 ```
 To increase the size of our shotgun sequences and find the relative contribution of each sample on each contig.
+```
+metaspades.py -1 allSamples_R1.fq.gz -2 allSamples_R2.fq.gz -o allSamples_spades
+```
+Combined assembly is then conducted with SPAdes (http://cab.spbu.ru/software/spades/):
 ```
 for FILE in $(ls *R1.fastq | sed 's/_R1.fastq//'); do metaspades.py -1 ${FILE}_R1.fastq -2 ${FILE}_R2.fastq -o ${FILE}; done
 ```
