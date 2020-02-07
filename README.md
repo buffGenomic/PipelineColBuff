@@ -15,8 +15,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-Multipe Bioinformatics Tools, Conda, BioConda, Python 3.X, MPI, OpenMP, SLURM HTC/HPC, snakemake
-Multipe Bioinformatics Tools are required for implementing this pipeline. However, to prevent conflicting versions of required software in each case, we suggest to install packages using the conda package manager (https://docs.conda.io/projects/conda/en/latest/index.html ) in separate environments. Many bioinformatics software are available in the Bioconda repository (https://anaconda.org/bioconda/).
+Multipe Bioinformatics Tools (Conda, BioConda, Python 3.X, MPI, OpenMP, SLURM HTC/HPC, snakemake ..) are required for implementing this pipeline. However, to prevent conflicting versions of required software in each case, we suggest to install packages using the conda package manager (https://docs.conda.io/projects/conda/en/latest/index.html ) in separate environments. Many bioinformatics software are available in the Bioconda repository (https://anaconda.org/bioconda/).
 Notes:
 1. All command lines assume that the required software has been installed as above.
 2. $PWD refers to the working directory where data is
