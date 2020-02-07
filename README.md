@@ -50,13 +50,60 @@ cat *R2.fastq.gz > allSamples_R2.fq.gz
 ```
 To increase the size of our shotgun sequences and find the relative contribution of each sample on each contig.
 ```
-metaspades.py -1 allSamples_R1.fq.gz -2 allSamples_R2.fq.gz -o allSamples_spades
+for FILE in $(ls *R1.fastq | sed 's/_R1.fastq//'); do metaspades.py -1 ${FILE}_R1.fastq -2 ${FILE}_R2.fastq -o ${FILE}; done
 ```
 Combined assembly is then conducted with SPAdes (http://cab.spbu.ru/software/spades/):
 ```
-for FILE in $(ls *R1.fastq | sed 's/_R1.fastq//'); do metaspades.py -1 ${FILE}_R1.fastq -2 ${FILE}_R2.fastq -o ${FILE}; done
+metaspades.py -1 allSamples_R1.fq.gz -2 allSamples_R2.fq.gz -o allSamples_spades
 ```
+Inside the allSamples_spades directory will be created a file “contigs.fa” which can be used for prediction of protein sequences using the software Prokka:
+```
+prokka --centre X --compliant --cpus 20 --outdir allSamples_prokka  --prefix allSamples $PWD/contigs.fasta
+```
+Alternatively, original (non-assembled) sequences can be use for de novo assembly of protein sequences with PLASS:
+```
+plass assemble $PWD/allSamples_R1.fq.gz $PWD/allSamples_R2.fq.gz allSamples_plass.faa tmp
+```
+Up to here, we have two sets of protein sequences, one annotated from contigs with Prokka and the second one assembled de novo with PLASS.  Since it is quite possible that both datasets are partially redundant, both files will be concatenated and clustered with “Linclust” to generate a non-redundant set of representative sequences of proteins:
+Concatenate both protein sequences files:
+```
+cat $PWD/allSamples_prokka/allSamples.faa $PWD/allSamples_plass.faa > allSamples_allProtSeqs.faa
+```
+And now the clustering with Linclust:
+```
+mmseqs easy-linclust $PWD/llSamples_allProtSeqs.faa clusteredSeqs_repSeqs_linclust.faa tmp
+mmseqs easy-linclust prokka_PLASS_allSamples.faa clusterRes tmp
+```
+File ‘ clusteredSeqs_repSeqs_linclust.faa’ now contain the non-redundant representative sequences of protein clustered and can be used as a query database for alignments.
+We used three different databases, UniRef, RumiRef, and Hungate100. We demonstrate the alignment procedure here with Hungate100 because it provided the most interesting results in terms of annotation of our sequences upon alignments.
 
+Index database for Diamond alignments:
+```
+diamond makedb –in hungate1000.fa -d hungate1000
+```
+This will create a single file called hungate1000.dmnd, which can be used for alignments as follows:
+```
+db=$PWD/hungate1000.dmnd
+diamond blastx -d $db -q clusteredSeqs_repSeqs_linclust.faa -o clusteredSeqs_repSeqs_linclust_hungate.txt -f 6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore stitle --max-target-seqs 1
+```
+The above command will report only the top hit and the annotation from the Hungate1000 dataset will come in the last column.
+
+Now we have to estimate the relative contribution of each sample to each protein sequence annotated. For that we align the set of representative sequences obtained from Linclust against each sample DNA sequences using diamond for a DNA to protein alignment:
+
+The first step is to index the representative sequences obtained with Linclust, which we will now use as a reference database with Diamond:
+```
+diamond makedb –in clusteredSeqs_repSeqs_linclust.faa -d protSeqs
+db=$PWD/protSeqs.dmnd
+for FILE in *R1.fq.gz; do
+diamond blastp -d $db -q $FILE -o ${FILE/R1.fq.gz/dmnd.txt} -f 6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore stitle --max-target-seqs 1
+done
+```
+This type of alignments will generate alignments that are indeed not very similar to the reference sequence.  Since each of our sequences was 300 bp in length, we decided to filter hits that with similarity to reference sequences higher than 90% on a stretch of at least 50 aminoacids (150 bp). That can be done with script ‘parse_remapping_results.pl’. 
+
+This will produce a table with the first column including the annotation of the protein, a second column the name of the protein sequence, and successive columns will indicate relative abundance of each protein in each sample in counts per million. This table is amenable for statistical analysis.
+
+
+----------------
 To increase the size and number of contigs and generate the "bins" (individual putative genomes).
 ```
 for FILE in $(ls *Comb.fastq | sed 's/_Comb.fastq//'); do metaspades.py -1 ${FILE}Comb1.fastq -2 ${FILE}Comb2.fastq -o ${FILE}; done
