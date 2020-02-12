@@ -1,5 +1,5 @@
 #Pipeline ColBuff
-# Project Workflow for Differences in methane emissions in two cohorts of Colombian buffalos were not associated with significant changes in their rumen microbiome
+# Lower methane emissions were associated with higher abundance of ruminal Prevotella in a cohort of Colombian buffalos
 #
 ## Authors
 Juan Jovel, Office of Research. Faculty of Medicine and Dentistry. University of Alberta. Edmonton, AB,Canada T6G 2E1
